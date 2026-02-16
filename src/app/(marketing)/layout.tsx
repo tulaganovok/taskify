@@ -3,6 +3,12 @@ import Navbar from './_components/navbar'
 import Footer from './_components/footer'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Taskify',
+  description: 'This is the marketing layout of Taskify'
+}
 
 export default async function MarketingLayout({ children }: PropsWithChildren) {
   const { isAuthenticated, orgId } = await auth()
