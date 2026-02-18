@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 import Navbar from './_components/navbar'
-import { auth } from '@clerk/nextjs/server'
+import { auth, } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { Metadata } from 'next'
 
