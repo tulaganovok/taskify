@@ -24,8 +24,8 @@ export default function NavItem({ isExpanded, isActive, organization, onExpand }
         className={cn(
           'flex items-center gap-x-2 p-1.5 rounded-md transition no-underline hover:no-underline text-base hover:bg-accent/30',
           isActive &&
-          !isExpanded &&
-          'bg-primary/10 text-primary hover:text-primary hover:bg-primary/10',
+            !isExpanded &&
+            'bg-primary/10 text-primary hover:text-primary hover:bg-primary/10',
         )}
       >
         <div className='flex items-center gap-x-2'>
@@ -35,7 +35,7 @@ export default function NavItem({ isExpanded, isActive, organization, onExpand }
               alt={organization.name}
               fill
               className='rounded-sm object-cover'
-              sizes="(max-width: 768px) 100vw, 33vw"
+              sizes='(max-width: 768px) 100vw, 33vw'
             />
           </div>
 
@@ -57,7 +57,7 @@ export default function NavItem({ isExpanded, isActive, organization, onExpand }
             className={cn(
               'w-full font-normal justify-start mb-1 hover:bg-accent/30',
               href === pathname &&
-              'bg-primary/10 text-primary hover:text-primary hover:bg-primary/10',
+                'bg-primary/10 text-primary hover:text-primary hover:bg-primary/10',
             )}
           >
             <Icon className='size-4 mr-1.5' />

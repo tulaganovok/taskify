@@ -41,6 +41,7 @@ export default function Sidebar({ storageKey = 't-sidebar-state' }: SidebarProps
     if (revalidateUserMemberships) {
       userMemberships.revalidate()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
   if (!isLoadedOrg || !isLoadedOrgList || userMemberships.isLoading)
@@ -72,3 +73,4 @@ export default function Sidebar({ storageKey = 't-sidebar-state' }: SidebarProps
     </>
   )
 }
+
