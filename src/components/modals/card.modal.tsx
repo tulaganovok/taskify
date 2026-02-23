@@ -6,23 +6,85 @@ import { fetcher } from '@/lib/utils'
 import CardTitleForm from '../forms/card-title.form'
 import { Skeleton } from '../ui/skeleton'
 import CardDescriptionForm from '../forms/card-description.form'
+import { Button } from '../ui/button'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { useParams } from 'next/navigation'
+import { copyCardById, deleteCardById } from '@/actions/card.action'
 
 export default function CardModal() {
   const { id, isOpen, onClose } = useCardModal()
+  const [isPending, setIsPending] = useState(false)
+  const params = useParams()
 
   const { data: card, isLoading } = useQuery<CardWithList>({
     queryKey: ['card', id],
     queryFn: () => fetcher(`/api/cards/${id}`),
   })
 
+  const onCopyCard = async () => {
+    setIsPending(true)
+
+    try {
+      await copyCardById(card?.id!, params.boardId as string)
+      toast.success('Card copied successfully')
+      onClose()
+    } catch {
+      toast.error('Failed to copy card')
+    } finally {
+      setIsPending(true)
+    }
+  }
+
+  const onDeleteCard = async () => {
+    setIsPending(true)
+
+    try {
+      await deleteCardById(card?.id!, params.boardId as string)
+      toast.success('Card deleted successfully')
+      onClose()
+    } catch {
+      toast.error('Failed to delete card')
+    } finally {
+      setIsPending(false)
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent onOpenAutoFocus={e => e.preventDefault()}>
         <DialogTitle className='hidden' />
         <DialogDescription className='hidden' />
 
         {isLoading ? (
-          <Skeleton className='w-3/4 h-7' />
+          <div className='space-y-6'>
+            <div className='space-y-2'>
+              <Skeleton className='w-2/3 h-6' />
+              <Skeleton className='w-1/3 h-4' />
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-4 md:gap-4'>
+              <div className='col-span-3 space-y-3'>
+                <div className='flex items-center gap-x-2 w-full'>
+                  <Skeleton className='size-5' />
+                  <Skeleton className='h-5 w-1/2' />
+                </div>
+
+                <div className='pl-6'>
+                  <Skeleton className='h-20 w-full' />
+                </div>
+              </div>
+
+              <div className='space-y-4 max-md:mt-6'>
+                <Skeleton className='h-4 w-32 md:w-full' />
+
+                <div className='grid grid-cols-2 md:grid-cols-1 gap-2'>
+                  <Skeleton className='h-7 w-full' />
+                  <Skeleton className='h-7 w-full' />
+                </div>
+              </div>
+            </div>
+          </div>
         ) : card ? (
           <>
             <CardTitleForm card={card} />
@@ -31,6 +93,31 @@ export default function CardModal() {
               <div className='col-span-3'>
                 <div className='w-full'>
                   <CardDescriptionForm card={card} />
+                </div>
+              </div>
+
+              <div className='space-y-2 max-md:mt-6'>
+                <p className='text-base font-semibold text-accent-foreground'>Actions</p>
+
+                <div className='grid grid-cols-2 md:grid-cols-1 gap-2'>
+                  <Button
+                    size={'sm'}
+                    variant={'outline'}
+                    disabled={isPending}
+                    onClick={onCopyCard}
+                  >
+                    Copy
+                  </Button>
+
+                  <Button
+                    size={'sm'}
+                    variant={'outline'}
+                    disabled={isPending}
+                    onClick={onDeleteCard}
+                    className='border-destructive hover:border-destructive text-destructive hover:text-destructive'
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             </div>

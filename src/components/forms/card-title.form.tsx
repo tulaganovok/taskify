@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { FieldGroup } from '../ui/field'
 import InputField from '../fields/input.field'
-import { useRef } from 'react'
+import { useRef, } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
@@ -19,6 +19,7 @@ export default function CardTitleForm({ card }: CardTitleFormProps) {
     resolver: zodResolver(cardTitleFormSchema),
     defaultValues: { title: card.title },
   })
+
   const inputRef = useRef<HTMLInputElement | null>(null)
   const queryClient = useQueryClient()
   const params = useParams()
@@ -39,7 +40,7 @@ export default function CardTitleForm({ card }: CardTitleFormProps) {
   }
 
   return (
-    <div className='flex items-center gap-x-3 mb-3 w-full'>
+    <div className='flex items-center gap-x-3 w-full'>
       <div className='w-full mr-4'>
         <form id='card-title-form' onSubmit={cardTitleForm.handleSubmit(onCardTitleFormSubmit)}>
           <FieldGroup>

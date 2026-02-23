@@ -104,7 +104,7 @@ export default function BoardTitleForm({ board }: BoardTitleFormProps) {
             hiddenErrorMessage
             onBlur={onBoardTitleFormBlur}
             onKeyDown={onKeyDown}
-            className='text-lg font-bold h-7 focus:focus-visible:outline-0 focus-visible:ring-transparent border-none text-white rounded-xs md:text-lg p-1 shadow-none'
+            className='text-lg font-bold h-7 focus:focus-visible:outline-0 focus-visible:ring-transparent border-none text-white rounded-xs md:text-lg p-1 shadow-none bg-transparent'
           />
         </FieldGroup>
       </form>

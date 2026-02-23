@@ -4,9 +4,14 @@ import Logo from '@/components/shared/logo'
 import { UserButton, useUser } from '@clerk/nextjs'
 import MobileSidebar from './mobile-sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useEffect, useState } from 'react'
 
 export default function Navbar() {
   const { isLoaded: isUserLoaded } = useUser()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
 
   return (
     <header className='fixed z-50 top-0 w-full h-14 border-b-2 flex items-center px-4 md:px-8 lg:px-16 xl:px-32 bg-background'>
@@ -40,7 +45,7 @@ export default function Navbar() {
           <Skeleton className='size-9 mx-2' />
         )} */}
 
-        {isUserLoaded ? (
+        {mounted && isUserLoaded ? (
           <UserButton appearance={{ elements: { avatarBox: { width: 35, height: 35 } } }} />
         ) : (
           <Skeleton className='size-9 rounded-full' />
