@@ -1,16 +1,20 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import { Organization } from './types';
-import { Activity, CreditCard, Layout, Settings } from 'lucide-react';
-import { startCase } from 'lodash';
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+import { Organization } from './types'
+import { Activity, CreditCard, Layout, Settings } from 'lucide-react'
+import { startCase } from 'lodash'
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 export function getNavItemRoutes(organization: Organization) {
   return [
-    { label: 'Boards', icon: Layout, href: `/organization/${organization.id}` },
+    {
+      label: 'Boards',
+      icon: Layout,
+      href: `/organization/${organization.id}`,
+    },
     {
       label: 'Activity',
       icon: Activity,
@@ -26,12 +30,23 @@ export function getNavItemRoutes(organization: Organization) {
       icon: CreditCard,
       href: `/organization/${organization.id}/billing`,
     },
-  ];
+  ]
 }
 
 export function getTitleBySlug(slug: string) {
-  const splittedSlug = slug.split('-');
-  const titleSlug = splittedSlug?.slice(0, splittedSlug.length - 1).join('-');
-  const title = startCase(titleSlug);
-  return title;
+  const splittedSlug = slug.split('-')
+  const titleSlug = splittedSlug?.slice(0, splittedSlug.length - 1).join('-')
+  const title = startCase(titleSlug)
+  return title
+}
+
+export function reorder<T>(list: T[], startIndex: number, endIndex: number) {
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed)
+  return result
+}
+
+export const fetcher = async (url: string) => {
+  return fetch(url).then(res => res.json())
 }

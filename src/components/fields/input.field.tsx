@@ -1,5 +1,5 @@
 import { Controller, Control, FieldPath, FieldValues } from 'react-hook-form'
-import { InputHTMLAttributes } from 'react'
+import { InputHTMLAttributes, Ref } from 'react'
 import { Field, FieldError, FieldLabel } from '../ui/field'
 import { PasswordInput } from '../ui/password-input'
 import { Input } from '../ui/input'
@@ -8,17 +8,17 @@ interface InputFieldProps<T extends FieldValues> extends InputHTMLAttributes<HTM
   name: FieldPath<T>
   control: Control<T>
   label?: string
+  ref?: Ref<HTMLInputElement | null>
+  hiddenErrorMessage?: boolean
 }
 
 export default function InputField<T extends FieldValues>({
   name,
   control,
+  ref,
   label = '',
-  placeholder = '',
-  type = 'text',
-  disabled = false,
-  className = '',
-  autoComplete,
+  hiddenErrorMessage = false,
+  ...props
 }: InputFieldProps<T>) {
   return (
     <Controller
@@ -28,29 +28,25 @@ export default function InputField<T extends FieldValues>({
         <Field data-invalid={fieldState.invalid}>
           {label && <FieldLabel htmlFor={field.name}>{label}</FieldLabel>}
 
-          {type === 'password' ? (
+          {props.type === 'password' ? (
             <PasswordInput
               {...field}
+              ref={ref}
               id={field.name}
               aria-invalid={fieldState.invalid}
-              placeholder={placeholder}
-              disabled={disabled}
-              className={className}
-              autoComplete={autoComplete}
+              {...props}
             />
           ) : (
             <Input
               {...field}
+              ref={ref}
               id={field.name}
               aria-invalid={fieldState.invalid}
-              placeholder={placeholder}
-              disabled={disabled}
-              className={className}
-              autoComplete={autoComplete}
+              {...props}
             />
           )}
 
-          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          {!hiddenErrorMessage && fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
       )}
     />

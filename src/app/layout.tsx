@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
+import QueryProvider from '@/components/providers/query.provider'
 
 const inter = Inter({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -23,10 +24,12 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
     <ClerkProvider>
       <html lang='en'>
         <body className={`${inter.className} antialiased`}>
-          <TooltipProvider>
-            {children}
-            <Toaster />
-          </TooltipProvider>
+          <QueryProvider>
+            <TooltipProvider>
+              {children}
+              <Toaster />
+            </TooltipProvider>
+          </QueryProvider>
         </body>
       </html>
     </ClerkProvider>

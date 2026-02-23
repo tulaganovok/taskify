@@ -25,5 +25,37 @@ model Board {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt      @map("updated_at")
 
+  lists         List[]
+
   @@map("boards")
+}
+
+model List {
+  id        String   @id             @default(cuid())
+  title     String 
+  order     Int
+  boardId   String   @map("board_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards     Card[]
+
+  @@index([boardId])
+  @@map("lists")
+}
+
+model Card {
+  id          String   @id             @default(cuid())
+  title       String
+  description String?  @db.Inet
+  order       Int
+  listId      String   @map("list_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+
+  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@index([listId])
+  @@map("cards")
 }
