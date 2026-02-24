@@ -1,12 +1,37 @@
 'use server'
 
-import { Board } from '@/generated/prisma/client'
+import { Action, Board, EntityType } from '@/generated/prisma/client'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { createAuditLog } from './audit-log.action'
+import {
+  decrementAvailableCount,
+  hasAvailableCount,
+  incrementAvailableCount,
+} from './org-limit.action'
+import { checkSubscription } from './subscription.action'
 
 export async function createBoard(data: Omit<Board, 'id' | 'createdAt' | 'updatedAt'>) {
-  return await prisma.board.create({ data })
+  const isAvailableCount = await hasAvailableCount()
+  const isPro = await checkSubscription()
+
+  if (!isAvailableCount && !isPro) return null
+
+  const newBoard = await prisma.board.create({ data })
+
+  if (!isPro) {
+    await incrementAvailableCount()
+  }
+
+  await createAuditLog({
+    entityTitle: newBoard.title,
+    entityId: newBoard.id,
+    entityType: EntityType.Board,
+    action: Action.Create,
+  })
+
+  return newBoard
 }
 
 export async function getOrgBoards() {
@@ -20,10 +45,30 @@ export async function getBoardById(id: string) {
 }
 
 export async function updateBoardById(id: string, data: Partial<Board>) {
-  await prisma.board.update({ where: { id }, data: data })
+  const updatedBoard = await prisma.board.update({ where: { id }, data: data })
+
+  await createAuditLog({
+    entityTitle: updatedBoard.title,
+    entityId: updatedBoard.id,
+    entityType: EntityType.Board,
+    action: Action.Update,
+  })
+
   revalidatePath(`/board/${id}`, 'layout')
 }
 
 export async function deleteBoardById(id: string) {
-  await prisma.board.delete({ where: { id } })
+  const deletedBoard = await prisma.board.delete({ where: { id } })
+  const isPro = await checkSubscription()
+
+  if (!isPro) {
+    await decrementAvailableCount()
+  }
+
+  await createAuditLog({
+    entityTitle: deletedBoard.title,
+    entityId: deletedBoard.id,
+    entityType: EntityType.Board,
+    action: Action.Delete,
+  })
 }

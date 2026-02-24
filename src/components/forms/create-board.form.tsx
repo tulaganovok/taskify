@@ -12,13 +12,14 @@ import { useAuth } from '@clerk/nextjs'
 import { createBoard } from '@/actions/board.action'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { useProModal } from '@/hooks/use-pro-modal'
 
 export default function CreateBoardForm() {
   const createBoardForm = useForm<CreateBoardFormSchema>({
     resolver: zodResolver(createBoardFormSchema),
     defaultValues: { title: '', image: '' },
   })
-
+  const { onOpen } = useProModal()
   const { orgId } = useAuth()
   const router = useRouter()
 
@@ -39,6 +40,12 @@ export default function CreateBoardForm() {
         imageLinkHtml,
         imageUserName,
       })
+
+      if (!newBoard) {
+        toast.warning('You have reached your limit of free boards. Please upgrade to create more.')
+        onOpen()
+        return
+      }
 
       toast.success('Board created successfully')
       router.push(`/board/${newBoard.id}`)

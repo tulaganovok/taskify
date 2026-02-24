@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { Organization } from './types'
+import { AuditLogClient, Organization } from './types'
 import { Activity, CreditCard, Layout, Settings } from 'lucide-react'
 import { startCase } from 'lodash'
 
@@ -49,4 +49,23 @@ export function reorder<T>(list: T[], startIndex: number, endIndex: number) {
 
 export const fetcher = async (url: string) => {
   return fetch(url).then(res => res.json())
+}
+
+export function generateLogMessage(auditLog: AuditLogClient) {
+  const { action, entityTitle, entityType } = auditLog
+
+  switch (action) {
+    case 'Create':
+      return ` created ${entityType.toLowerCase()} "${entityTitle}"`
+    case 'Update':
+      return ` updated ${entityType.toLowerCase()} "${entityTitle}"`
+    case 'Delete':
+      return ` deleted ${entityType.toLowerCase()} "${entityTitle}"`
+    default:
+      return ` unknown action ${entityType.toLowerCase()} "${entityTitle}"`
+  }
+}
+
+export function getAbsoluteUrl(relativeUrl: string) {
+  return `${process.env.NEXT_PUBLIC_APP_URL}${relativeUrl}`
 }

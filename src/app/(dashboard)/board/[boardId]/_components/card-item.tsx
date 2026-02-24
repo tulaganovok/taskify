@@ -21,7 +21,7 @@ export default function CardItem({ index, card }: CardItemProps) {
           role='button'
           className='truncate border-2 border-transparent hover:border-primary py-2 px-3 text-sm bg-white rounded-md shadow-sm'
         >
-          CardItem {index}: {card.title}
+         {card.title}
         </div>
       )}
     </Draggable>

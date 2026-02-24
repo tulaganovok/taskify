@@ -59,3 +59,52 @@ model Card {
   @@index([listId])
   @@map("cards")
 }
+
+enum Action {
+  Create
+  Update
+  Delete
+}
+
+enum EntityType {
+  Board
+  List
+  Card
+}
+
+model AuditLog {
+  id          String     @id             @default(cuid())
+  orgId       String     @map("org_id")
+  action      Action
+  entityId    String     @map("entity_id")
+  entityType  EntityType @map("entity_type")
+  entityTitle String     @map("entity_title")
+  userId      String     @map("user_id")
+  userImage   String     @db.Text        @map("user_image")
+  userName    String     @db.Text        @map("user_name")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt      @map("updated_at")
+
+  @@map("audit_logs")
+}
+
+model OrgLimit {
+  id        String   @id             @default(cuid())
+  orgId     String   @unique         @map("org_id")
+  count     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@map("org_limits")
+}
+
+model OrgSubscription {
+  id                     String    @id     @default(cuid())
+  orgId                  String    @unique @map("org_id")
+  stripeCustomerId       String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId   String?   @unique @map("stripe_subscription_id")
+  stripePriceId          String?   @map("stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map("stripe_current_period_end")
+
+  @@map("org_subscriptions")
+}

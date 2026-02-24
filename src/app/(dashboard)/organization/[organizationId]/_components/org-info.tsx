@@ -5,7 +5,11 @@ import { CreditCard } from 'lucide-react'
 import Image from 'next/image'
 import OrgInfoSkeleton from './org-info-skeleton'
 
-export default function OrgInfo() {
+interface OrgInfoProps {
+  isPro: boolean
+}
+
+export default function OrgInfo({ isPro }: OrgInfoProps) {
   const { organization, isLoaded } = useOrganization()
 
   if (!isLoaded) return <OrgInfoSkeleton />
@@ -26,7 +30,7 @@ export default function OrgInfo() {
 
         <div className='flex items-center text-sm text-muted-foreground'>
           <CreditCard className='size-4 mr-1.5' />
-          Free
+          {isPro ? 'Pro' : 'Free'}
         </div>
       </div>
     </div>

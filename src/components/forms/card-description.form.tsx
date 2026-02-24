@@ -26,7 +26,7 @@ export default function CardDescriptionForm({ card }: CardDescriptionProps) {
 
   const cardDescriptionForm = useForm<CardDescriptionFormSchema>({
     resolver: zodResolver(cardDescriptionFormSchema),
-    defaultValues: { description: card.description ?? '' }
+    defaultValues: { description: card.description ?? '' },
   })
 
   const isCardFormSubmitting = cardDescriptionForm.formState.isSubmitting
@@ -34,7 +34,10 @@ export default function CardDescriptionForm({ card }: CardDescriptionProps) {
   const onCardDescriptionFormSubmit = async (data: CardDescriptionFormSchema) => {
     try {
       await updateCardById(card.id, params.boardId as string, data)
+
       await queryClient.invalidateQueries({ queryKey: ['card', card.id] })
+      await queryClient.invalidateQueries({ queryKey: ['card-logs', card.id] })
+
       toast.success('Card description updated successfully')
       disableEditing()
     } catch {
@@ -53,7 +56,6 @@ export default function CardDescriptionForm({ card }: CardDescriptionProps) {
       textareaRef.current?.select()
     }
   }, [isEditing])
-
 
   return (
     <div className='flex items-start gap-x-3 w-full'>
@@ -78,11 +80,7 @@ export default function CardDescriptionForm({ card }: CardDescriptionProps) {
               />
 
               <div className='flex items-center gap-x-2'>
-                <Button
-                  type='submit'
-                  size={'sm'}
-                  disabled={isCardFormSubmitting}
-                >
+                <Button type='submit' size={'sm'} disabled={isCardFormSubmitting}>
                   Save
                 </Button>
 
@@ -101,7 +99,10 @@ export default function CardDescriptionForm({ card }: CardDescriptionProps) {
         ) : (
           <div
             role='button'
-            className={cn('min-h-20 text-sm font-medium py-3 px-3.5 rounded-md bg-secondary', !card.description && 'text-muted-foreground')}
+            className={cn(
+              'min-h-20 text-sm font-medium py-3 px-3.5 rounded-md bg-secondary',
+              !card.description && 'text-muted-foreground',
+            )}
             onClick={() => setIsEditing(true)}
           >
             {card.description ?? 'Add a more detailed description...'}

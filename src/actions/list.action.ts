@@ -1,9 +1,10 @@
 'use server'
 
-import { List } from '@/generated/prisma/client'
+import { Action, EntityType, List } from '@/generated/prisma/client'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { createAuditLog } from './audit-log.action'
 
 export async function getListsByBoardId(boardId: string) {
   const { orgId } = await auth()
@@ -27,17 +28,41 @@ export async function createList(boardId: string, title: string) {
   })
 
   const newOrder = lastList ? lastList.order + 1 : 1
-  await prisma.list.create({ data: { title, boardId, order: newOrder } })
+  const newList = await prisma.list.create({ data: { title, boardId, order: newOrder } })
+
+  await createAuditLog({
+    entityTitle: newList.title,
+    entityId: newList.id,
+    entityType: EntityType.List,
+    action: Action.Create,
+  })
+
   revalidatePath(`/board/${boardId}`, 'page')
 }
 
 export async function updateListById(id: string, boardId: string, data: Pick<List, 'title'>) {
-  await prisma.list.update({ where: { id }, data })
+  const updatedList = await prisma.list.update({ where: { id }, data })
+
+  await createAuditLog({
+    entityTitle: updatedList.title,
+    entityId: updatedList.id,
+    entityType: EntityType.List,
+    action: Action.Update,
+  })
+
   revalidatePath(`/board/${boardId}`, 'page')
 }
 
 export async function deleteListById(id: string, boardId: string) {
-  await prisma.list.delete({ where: { id } })
+  const deletedList = await prisma.list.delete({ where: { id } })
+
+  await createAuditLog({
+    entityTitle: deletedList.title,
+    entityId: deletedList.id,
+    entityType: EntityType.List,
+    action: Action.Delete,
+  })
+
   revalidatePath(`/board/${boardId}`, 'page')
 }
 
@@ -57,7 +82,7 @@ export async function copyList(listId: string, boardId: string) {
 
   const newOrder = lastList ? lastList.order + 1 : 1
 
-  await prisma.list.create({
+  const copiedList = await prisma.list.create({
     data: {
       title: `${listToCopy.title} - Copy`,
       boardId: listToCopy.boardId,
@@ -73,6 +98,13 @@ export async function copyList(listId: string, boardId: string) {
       },
     },
     include: { cards: true },
+  })
+
+  await createAuditLog({
+    entityTitle: copiedList.title,
+    entityId: copiedList.id,
+    entityType: EntityType.List,
+    action: Action.Create,
   })
 
   revalidatePath(`/board/${boardId}`, 'page')

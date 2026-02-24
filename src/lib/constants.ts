@@ -1,3 +1,7 @@
+export const MAX_FREE_BOARDS = 5
+
+export const DAY_IN_MS = 86_400_000
+
 export const defaultImages = [
   {
     id: 'FCCRrIpQ20c',

@@ -4,11 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { FieldGroup } from '../ui/field'
 import InputField from '../fields/input.field'
-import { useRef, } from 'react'
+import { useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { updateCardById } from '@/actions/card.action'
+import { LayoutIcon } from 'lucide-react'
 
 interface CardTitleFormProps {
   card: CardWithList
@@ -32,7 +33,10 @@ export default function CardTitleForm({ card }: CardTitleFormProps) {
 
     try {
       await updateCardById(card.id, params.boardId as string, data)
-      queryClient.invalidateQueries({ queryKey: ['card', card.id] })
+
+    await  queryClient.invalidateQueries({ queryKey: ['card', card.id] })
+    await  queryClient.invalidateQueries({ queryKey: ['card-logs', card.id] })
+
       toast.success('Card title updated successfully')
     } catch {
       toast.error('Failed to update card title')
@@ -40,7 +44,9 @@ export default function CardTitleForm({ card }: CardTitleFormProps) {
   }
 
   return (
-    <div className='flex items-center gap-x-3 w-full'>
+    <div className='flex items-start gap-x-3 w-full'>
+      <LayoutIcon className='size-5 mt-1 text-accent-foreground' />
+
       <div className='w-full mr-4'>
         <form id='card-title-form' onSubmit={cardTitleForm.handleSubmit(onCardTitleFormSubmit)}>
           <FieldGroup>

@@ -11,6 +11,9 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useParams } from 'next/navigation'
 import { copyCardById, deleteCardById } from '@/actions/card.action'
+import { AuditLog } from '@/generated/prisma/client'
+import Activity from '../shared/activity'
+import { Copy, Trash } from 'lucide-react'
 
 export default function CardModal() {
   const { id, isOpen, onClose } = useCardModal()
@@ -22,11 +25,16 @@ export default function CardModal() {
     queryFn: () => fetcher(`/api/cards/${id}`),
   })
 
+  const { data: auditLogs } = useQuery<AuditLog[]>({
+    queryKey: ['card-logs', id],
+    queryFn: () => fetcher(`/api/cards/${id}/logs`),
+  })
+
   const onCopyCard = async () => {
     setIsPending(true)
 
     try {
-      await copyCardById(card?.id!, params.boardId as string)
+      await copyCardById(card?.id as string, params.boardId as string)
       toast.success('Card copied successfully')
       onClose()
     } catch {
@@ -40,7 +48,7 @@ export default function CardModal() {
     setIsPending(true)
 
     try {
-      await deleteCardById(card?.id!, params.boardId as string)
+      await deleteCardById(card?.id as string, params.boardId as string)
       toast.success('Card deleted successfully')
       onClose()
     } catch {
@@ -52,7 +60,7 @@ export default function CardModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent onOpenAutoFocus={e => e.preventDefault()}>
+      <DialogContent className='md:min-w-3xl top-[40%]' onOpenAutoFocus={e => e.preventDefault()}>
         <DialogTitle className='hidden' />
         <DialogDescription className='hidden' />
 
@@ -99,28 +107,33 @@ export default function CardModal() {
               <div className='space-y-2 max-md:mt-6'>
                 <p className='text-base font-semibold text-accent-foreground'>Actions</p>
 
-                <div className='grid grid-cols-2 md:grid-cols-1 gap-2'>
+                <div className='flex flex-row md:flex-col gap-2'>
                   <Button
                     size={'sm'}
-                    variant={'outline'}
+                    variant={'secondary'}
                     disabled={isPending}
                     onClick={onCopyCard}
+                    className='justify-start'
                   >
+                    <Copy/>
                     Copy
                   </Button>
 
                   <Button
                     size={'sm'}
-                    variant={'outline'}
+                    variant={'secondary'}
                     disabled={isPending}
                     onClick={onDeleteCard}
-                    className='border-destructive hover:border-destructive text-destructive hover:text-destructive'
+                    className='border-destructive hover:border-destructive text-destructive hover:text-destructive justify-start'
                   >
+                    <Trash />
                     Delete
                   </Button>
                 </div>
               </div>
             </div>
+
+            {auditLogs ? <Activity auditLogs={auditLogs} /> : <Activity.Skeleton />}
           </>
         ) : (
           <div className='text-sm text-muted-foreground'>Card not found</div>
